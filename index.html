@@ -642,8 +642,8 @@ function normalize(str) {
     .normalize('NFD')
     .replace(/[\u0300-\u036f]/g, '')       // quitar tildes
     .toLowerCase()
-    .replace(/(\d)\.(\d{3})/g, '$1$2')    // 2.000 → 2000
-    .replace(/(\d),(\d{3})/g, '$1$2')     // 2,000 → 2000
+    .replace(/(\d)\.(\d{3})(?!\d)/g, '$1$2')    // 2.000 → 2000 (solo miles exactos)
+    .replace(/(\d),(\d{3})(?!\d)/g, '$1$2')     // 2,000 → 2000 (solo miles exactos)
     .replace(/\s+/g, ' ')
     .trim();
 }
@@ -671,23 +671,28 @@ function matchesAll(tokens, text, code) {
   const normDesc = normalize(text);
   const normCode = normalize(code);
 
-  // Limpiar descripción de números con punto/coma tipo "1.250N" o "(750N)"
-  const cleanDesc = normDesc
-    .replace(/\d+[.,]\d+\s*[nN]?\)?/g, ' ')  // quitar 1.250N, (750N), etc
-    .replace(/\(\d+[nN]\)/g, ' ');             // quitar (1250N)
+  // Eliminar voltajes (600V), temperaturas (125C) y Newton (1.250N) antes de buscar
+  let cleanDesc = normDesc
+    .replace(/\d+[,.]\d+\s*[nN]/g, ' ')
+    .replace(/\(\d+[nN]\)/g, ' ')
+    .replace(/\d+\s*[vV]\s/g, ' ')
+    .replace(/\d+\s*[vV]$/g, ' ')
+    .replace(/\d+\s*[cC]\s/g, ' ')
+    .replace(/\d+\s*[cC]$/g, ' ');
 
-  const haystack = cleanDesc + ' ' + normalize(code);
+  // Convertir comas decimales a puntos: "12,0" → "12.0"
+  cleanDesc = cleanDesc.replace(/(\d+),(\d+)/g, '$1.$2');
+  const haystack = cleanDesc + ' ' + normCode;
 
-  return tokens.every(t => {
+  return tokens.every(function(t) {
     if (/^\d+$/.test(t)) {
-      // Número: no debe estar precedido por otro dígito
-      // "50" encuentra "50mm", "500", "50 " pero NO "1250" ni "350"
-      const re = new RegExp('(^|[^0-9])' + t);
+      var re = new RegExp('(^|[^0-9])' + t + '([^0-9]|$|[.])');
       return re.test(haystack);
     }
-    return haystack.includes(t);
+    return haystack.indexOf(t) !== -1;
   });
 }
+
 
 function hl(text, tokens) {
   if (!tokens || !tokens.length || !text) return text || '';
