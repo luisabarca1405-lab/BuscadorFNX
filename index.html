@@ -479,7 +479,8 @@
   .card-action { padding: 0 14px; border-left: 1px solid var(--border); flex-shrink: 0; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:4px; min-width:80px; }
   .btn-copy { background: none; border: 1.5px solid var(--border); border-radius: 8px; padding: 6px 13px; font-size: 12px; font-weight: 600; color: var(--muted); cursor: pointer; transition: all .15s; white-space: nowrap; }
   .btn-copy:hover { border-color: var(--brand); color: var(--brand); background: #FFF5F5; }
-  .btn-copy.ok { border-color: #16A34A; color: #16A34A; background: #F0FDF4; }
+  .btn-copy.ok { border-color: #16A34A; color: #16A34A; background: #F0FDF4; font-weight: 700; }
+  body.dark-mode .btn-copy.ok { border-color: #22C55E !important; color: #22C55E !important; background: rgba(34,197,94,0.12) !important; }
 
   /* WELCOME */
   .welcome { padding: 48px 20px; text-align: center; }
@@ -645,6 +646,41 @@
   /* ── CARD CHECK DARK MODE ── */
   body.dark-mode .card-check { border-right-color: #2D3148; }
   body.dark-mode .card.selected { background: rgba(245,166,35,0.08) !important; }
+
+  /* ── COLUMNA SECCIÓN ── */
+  .card-section {
+    flex-shrink: 0;
+    width: 120px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-left: 1px solid var(--border);
+    padding: 0 10px;
+  }
+  .badge-section {
+    font-size: 9px;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    padding: 4px 8px;
+    border-radius: 5px;
+    text-align: center;
+    line-height: 1.5;
+    white-space: normal;
+    word-break: keep-all;
+    overflow-wrap: normal;
+    hyphens: none;
+    background: rgba(100,110,140,0.13);
+    color: #778;
+    border: 1px solid rgba(100,110,140,0.22);
+    max-width: 115px;
+  }
+  body.dark-mode .card-section { border-left-color: #2D3148; }
+  body.dark-mode .badge-section {
+    background: rgba(255,255,255,0.06);
+    color: #8A94AB;
+    border-color: rgba(255,255,255,0.1);
+  }
 </style>
 </head>
 <body>
@@ -1122,10 +1158,11 @@ function doSearch() {
       <div class="card-body">
         <div class="card-top">
           <span class="code">${hl(p.code, tokens)}</span>${cintaBadge}${termoBadge}${polesBadge}${estancaBadge}${cajaKoBadge}${perfilBadge}${canastilloBadge}${conduletBadge}${largoTuboBadge}${rolloBadge}${emtBadge}${puertaIntBadge}${alargadorBadge}${portalampBadge}${puertaBadge}${pernoBadge}${voltBadge}${uvBadge}${largoBadge}${usbBadge}${materialBadge}
-          <span class="sec-badge">${p.section}</span>
-          <span class="page-badge">Pág. ${p.page}</span>
         </div>
         <div class="card-desc${p.description ? '' : ' empty'}">${p.description ? hl(colorDesc(p.description), tokens) : '—'}</div>
+      </div>
+      <div class="card-section">
+        <span class="badge-section">${p.section ? p.section.replace('PRODUCTOS INMOVILIZADOS','INMOVILIZADO') : ''}</span>
       </div>
       <div class="card-action">
         ${fichaBtn}${manualBtn}${unionBtn}
